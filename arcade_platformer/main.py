@@ -7,7 +7,7 @@ import pathlib
 
 # Screen constants
 SCREEN_WIDTH = 1520
-SCREEN_HEIGHT = 760
+SCREEN_HEIGHT = 680
 SCREEN_TITLE = "Revenge of the Bowling Pins"
 
 ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "assets"
@@ -17,7 +17,7 @@ MAP_SCALING = 1.0
 # Player constants
 GRAVITY = 1.0
 PLAYER_START_X = 500
-PLAYER_START_Y = 256
+PLAYER_START_Y = 300
 PLAYER_MOVE_SPEED = 10
 PLAYER_JUMP_SPEED = 20
 
@@ -44,6 +44,7 @@ class PlatformerView(arcade.View):
         self.goals = None
         self.enemies = None
         self.moving_platforms = None
+        self.gutters = None
 
         self.game_map = None
 
@@ -62,7 +63,7 @@ class PlatformerView(arcade.View):
         self.physics_engine = None
 
         # score ?
-        self.score = 0
+        # self.score = 0
 
         # initial level
         self.level = 1
@@ -92,6 +93,7 @@ class PlatformerView(arcade.View):
         background_layer = "background"
         ladders_layer = "ladders"
         moving_platforms_layer = "moving_platforms"
+        gutters_layer = "gutters"
 
         # load map
         self.game_map = arcade.load_tilemap(map_path, MAP_SCALING)
@@ -107,8 +109,10 @@ class PlatformerView(arcade.View):
         self.walls = self.scene[wall_layer]
         self.ladders = self.scene[ladders_layer]
         self.coins = self.scene[coin_layer]
+        self.gutters = self.scene[gutters_layer]
         if self.level > 1:
             self.moving_platforms = self.scene[moving_platforms_layer]
+
 
             # so that player can stand on the moving platforms even though they are separate from the walls
             for sprite in self.moving_platforms:
@@ -234,13 +238,11 @@ class PlatformerView(arcade.View):
         """Called when the user releases a key. """
 
         if key in [arcade.key.UP, arcade.key.W]:
-            if self.physics_engine.is_on_ladder():
-                self.up_pressed = False
-                self.update_player_speed()
+            self.up_pressed = False
+            self.update_player_speed()
         elif key in [arcade.key.DOWN, arcade.key.S]:
-            if self.physics_engine.is_on_ladder():
-                self.down_pressed = False
-                self.update_player_speed()
+            self.down_pressed = False
+            self.update_player_speed()
         elif key in [arcade.key.LEFT, arcade.key.A]:
             self.left_pressed = False
             self.update_player_speed()
@@ -278,12 +280,12 @@ class PlatformerView(arcade.View):
             self.player.left = 0
 
         # check if we've picked up a coin
-        coins_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.coins)
+        # coins_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.coins)
 
-        for coin in coins_hit:
-            self.score += int(coin.properties["point_value"])
-            # arcade.play_sound(self.coin_sound)
-            coin.remove_from_sprite_lists()
+        # for coin in coins_hit:
+        #     self.score += int(coin.properties["point_value"])
+        #     # arcade.play_sound(self.coin_sound)
+        #     coin.remove_from_sprite_lists()
 
         # enemy collision
         enemies_hit = arcade.check_for_collision_with_list(
@@ -292,14 +294,18 @@ class PlatformerView(arcade.View):
 
         if enemies_hit:
             self.setup()
-            title_view = TitleView()
-            window.show_view(title_view)
+            # title_view = TitleView()
+            # window.show_view(title_view)
 
         # now check if we're at goal
         goals_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.goals)
         if goals_hit:
             # self.victory_sound.play()
             self.level += 1
+            self.setup()
+
+        gutters_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.gutters)
+        if gutters_hit:
             self.setup()
 
         # set viewport, scrolling if necessary
@@ -311,31 +317,32 @@ class PlatformerView(arcade.View):
         # Draw all the sprites
         self.background.draw()
         self.walls.draw()
-        self.coins.draw()
+        # self.coins.draw()
         self.goals.draw()
         self.ladders.draw()
         self.enemies.draw()
         self.player.draw()
+        self.gutters.draw()
 
         # draw score in lower left with text
-        score_text = f"Score: {self.score}"
+        # score_text = f"Score: {self.score}"
 
-        arcade.draw_text(
-            score_text,
-            start_x=10 + self.view_left,
-            start_y=10 + self.view_bottom,
-            color=arcade.csscolor.BLACK,
-            font_size=40,
-        )
+        # arcade.draw_text(
+        #     score_text,
+        #     start_x=10 + self.view_left,
+        #     start_y=10 + self.view_bottom,
+        #     color=arcade.csscolor.BLACK,
+        #     font_size=40,
+        # )
 
         # Now in white, slightly shifted
-        arcade.draw_text(
-            score_text,
-            start_x=15 + self.view_left,
-            start_y=15 + self.view_bottom,
-            color=arcade.csscolor.WHITE,
-            font_size=40,
-        )
+        # arcade.draw_text(
+        #     score_text,
+        #     start_x=15 + self.view_left,
+        #     start_y=15 + self.view_bottom,
+        #     color=arcade.csscolor.WHITE,
+        #     font_size=40,
+        # )
 
     def scroll_viewport(self):
         # left boundary
@@ -384,7 +391,7 @@ class PlatformerView(arcade.View):
         enemies = arcade.SpriteList()
 
         if self.level == 2:
-            enemies.append(Enemy(1464, 320))
+            enemies.append(Enemy(2000, 320))
 
         return enemies
 
@@ -519,16 +526,15 @@ class Enemy(arcade.AnimatedWalkingSprite):
     """enemy sprite with basic walking movement"""
 
     def __init__(self, pos_x: int, pos_y: int):
-        super().__init__(center_x=pos_x, center_y=pos_y)
+        super().__init__(center_x=pos_x, center_y=pos_y, scale=0.8)
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
 
         # set up appropriate textures
         walking_texture_path = [
-            texture_path / "slimePurple.png",
-            texture_path / "slimePurple_move.png",
+            texture_path / "cyan_bb.png",
         ]
-        standing_texture_path = texture_path / "slimePurple.png"
+        standing_texture_path = texture_path / "cyan_bb.png"
 
         # load all textures
         self.walk_left_textures = [
