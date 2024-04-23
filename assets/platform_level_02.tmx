@@ -1,46 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="25" height="20" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#a6e7ff" nextlayerid="14" nextobjectid="27">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="25" height="20" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#a6e7ff" nextlayerid="15" nextobjectid="29">
  <tileset firstgid="1" source="arcade_platformer.tsx"/>
+ <tileset firstgid="43" source="../assets_learning/arcade_platformer.tsx"/>
+ <layer id="14" name="gutters" width="25" height="20">
+  <data encoding="base64" compression="zlib">
+   eAFjYBgFoyEwGgKjITAaAqMhMPRCoAzoZGx46PmEOi4GANyGAsU=
+  </data>
+ </layer>
  <layer id="1" name="ground" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjIUC/EGADWiWIhNnpZ/WoTYMgBASo5AZQGsIFSLUDOT3Sis0MdCytMQAgDgJm
+   eAFjYKAtKKWt8WDTR+0gPpBHw2o0rIgPAeJVkpKuQGrRMTE2kWIHMeZhUzNqB7ZQwS5GbliRog+fWnLl0H0DMme4YAAuACK9
   </data>
  </layer>
  <layer id="2" name="background" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjIQAJAenRgBjRITCY41+FiJiRJ0INSIkSEBOrlkgjB4UyABrLALs=
+   eAFjYBgFoyEwGgKjIYAIAR8Ek8EXiT3KHA2BgQwBFQos90PTO1zTNQDwZgFZ
   </data>
  </layer>
  <objectgroup id="12" name="moving_platforms">
-  <object id="21" gid="11" x="890.707" y="2176.67" width="128" height="128">
+  <object id="27" gid="119" x="960.298" y="2172.85" width="128" height="128">
    <properties>
-    <property name="boundary_left" type="float" value="900"/>
+    <property name="boundary_left" type="float" value="1000"/>
     <property name="boundary_right" type="float" value="1600"/>
     <property name="change_x" type="float" value="2"/>
    </properties>
   </object>
-  <object id="22" gid="11" x="2174.94" y="2302.94" width="128" height="128">
+  <object id="28" gid="119" x="2125.19" y="1533.02" width="128" height="128">
    <properties>
-    <property name="boundary_bottom" type="float" value="320"/>
-    <property name="boundary_left" type="float" value="2048"/>
-    <property name="boundary_right" type="float" value="2560"/>
-    <property name="boundary_top" type="float" value="1280"/>
-    <property name="change_x" type="float" value="1.25"/>
-    <property name="change_y" type="float" value="1"/>
+    <property name="boundary_left" type="float" value="2000"/>
+    <property name="boundary_right" type="float" value="2300"/>
+    <property name="change_x" type="float" value="2"/>
    </properties>
   </object>
  </objectgroup>
  <layer id="13" name="ladders" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhMBoCQz0EAAfQAAE=
+   eAFjYBgFoyEwGgKjITC4QsCbDs4ZtYP4QB4NK+LDaiBVAgA6qAIO
   </data>
  </layer>
  <layer id="3" name="goal" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhMLhCQI4OzpGlgx30tAIAQ3gAPA==
+   eAFjYBgFoyEwGgJDIQQ86OBIdzrYMWrFaAiMhgBtQgAAPE4AkA==
   </data>
  </layer>
- <objectgroup id="8" name="coins">
+ <objectgroup id="8" name="coins" visible="0">
   <object id="23" gid="24" x="1414.26" y="2306.02" width="128" height="128">
    <properties>
     <property name="point_value" type="float" value="20"/>

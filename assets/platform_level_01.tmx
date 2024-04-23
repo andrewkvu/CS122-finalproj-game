@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="128" tileheight="128" infinite="0" nextlayerid="8" nextobjectid="6">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="128" tileheight="128" infinite="0" nextlayerid="11" nextobjectid="6">
  <tileset firstgid="1" source="arcade_platformer.tsx"/>
+ <tileset firstgid="43" source="../assets_learning/arcade_platformer.tsx"/>
+ <layer id="10" name="gutters" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T20JT6AAAHgaCWAAAQ==
+  </data>
+ </layer>
  <layer id="1" name="ground" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIJRMApGwVAG/EDMiIb56GAnJxAzo2EOHHaju49cjM1OZLvR1TMNEAYArogA0Q==
+   eJxjYBgFo2AUjIJRMApGAbVAKRIeCDvpZTc2O/HZjU/9cMQA24YiSA==
   </data>
  </layer>
  <layer id="3" name="ladders" width="30" height="20">
@@ -13,7 +19,7 @@
  </layer>
  <layer id="4" name="background" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIJRMApGAS2A/EA7AA9QQWLjcyclflCiQO9QBwDo0ACk
+   eJxjYBgFo2AUjIJRMApGwUgDKgTki6hghxIVzBiqAADq2AC5
   </data>
  </layer>
  <layer id="5" name="goal" width="30" height="20">
@@ -21,7 +27,7 @@
    eJxjYBgFo2AUjIJRMApGwXAHcgNkr+wA2TvQAABQmAA8
   </data>
  </layer>
- <objectgroup id="6" name="coins">
+ <objectgroup id="6" name="coins" visible="0">
   <object id="1" gid="23" x="516" y="2312" width="128" height="128">
    <properties>
     <property name="point_value" type="int" value="10"/>
