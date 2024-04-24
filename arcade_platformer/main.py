@@ -4,6 +4,7 @@ https://realpython.com/platformer-python-arcade/
 
 import arcade
 import pathlib
+import math
 
 # Screen constants
 SCREEN_WIDTH = 1520
@@ -559,6 +560,19 @@ class Enemy(arcade.AnimatedWalkingSprite):
 
         # set initial texture
         self.texture = self.stand_left_textures[0]
+
+        # set rotation speed for bowling ball
+        self.rotation_speed = 5
+        
+
+    def update(self):
+        # Call the parent class's update method
+        super().update()
+
+        # Calculate the angle of movement based on the change in position
+        if self.change_x != 0 or self.change_y != 0:
+            angle = math.atan2(self.change_y, self.change_x)
+            self.angle = math.degrees(angle)
 
 
 if __name__ == "__main__":
