@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="25" height="20" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#a6e7ff" nextlayerid="8" nextobjectid="16">
  <tileset firstgid="1" source="../materials-arcade-platformer/assets/arcade_platformer.tsx"/>
- <tileset firstgid="152" source="../assets_learning/arcade_platformer.tsx"/>
+ <tileset firstgid="152" source="arcade_platformer.tsx"/>
  <layer id="7" name="gutters" width="25" height="20">
   <data encoding="base64" compression="zlib">
    eAFjYBgFoyEwGgKjITAaAqMhMBoCQz0EAAfQAAE=

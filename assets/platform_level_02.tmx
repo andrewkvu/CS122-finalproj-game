@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="25" height="20" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#a6e7ff" nextlayerid="15" nextobjectid="29">
  <tileset firstgid="1" source="arcade_platformer.tsx"/>
- <tileset firstgid="43" source="../assets_learning/arcade_platformer.tsx"/>
  <layer id="14" name="gutters" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhMPRCoAzoZGx46PmEOi4GANyGAsU=
+   eAFjYBgFoyEwGgKjITAaAqMhMPRCwAfoZGx46PmEOi4GANqPAck=
   </data>
  </layer>
  <layer id="1" name="ground" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYKAtKKWt8WDTR+0gPpBHw2o0rIgPAeJVkpKuQGrRMTE2kWIHMeZhUzNqB7ZQwS5GbliRog+fWnLl0H0DMme4YAAuACK9
+   eAFjYKAt8Kat8WDTR+0gPpBHw2o0rIgPAeJVkpKuQGrRMTE2kWIHMeZhUzNqB7ZQwS5GbliRog+fWnLl0H0DMme4YAB1mxZF
   </data>
  </layer>
  <layer id="2" name="background" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjIYAIAR8Ek8EXiT3KHA2BgQwBFQos90PTO1zTNQDwZgFZ
+   eAFjYBgFoyEwGgKjIYAIASUEk0EZiT3KHA2BgQwBFQosR9c7XNM1AG8fALE=
   </data>
  </layer>
  <objectgroup id="12" name="moving_platforms">
-  <object id="27" gid="119" x="960.298" y="2172.85" width="128" height="128">
+  <object id="27" gid="77" x="960.298" y="2172.85" width="128" height="128">
    <properties>
     <property name="boundary_left" type="float" value="1000"/>
     <property name="boundary_right" type="float" value="1600"/>
     <property name="change_x" type="float" value="2"/>
    </properties>
   </object>
-  <object id="28" gid="119" x="2125.19" y="1533.02" width="128" height="128">
+  <object id="28" gid="77" x="2125.19" y="1533.02" width="128" height="128">
    <properties>
     <property name="boundary_left" type="float" value="2000"/>
     <property name="boundary_right" type="float" value="2300"/>
@@ -35,12 +34,12 @@
  </objectgroup>
  <layer id="13" name="ladders" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITC4QsCbDs4ZtYP4QB4NK+LDaiBVAgA6qAIO
+   eAFjYBgFoyEwGgKjITC4QkCRDs4ZtYP4QB4NK+LDaiBVAgDgswDo
   </data>
  </layer>
  <layer id="3" name="goal" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgJDIQQ86OBIdzrYMWrFaAiMhgBtQgAAPE4AkA==
+   eAFjYBgFoyEwGgJDIQTk6OBIWTrYMWrFaAiMhgBtQgAA8MgAPA==
   </data>
  </layer>
  <objectgroup id="8" name="coins" visible="0">
