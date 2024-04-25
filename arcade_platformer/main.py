@@ -4,6 +4,7 @@ https://realpython.com/platformer-python-arcade/
 
 import arcade
 import pathlib
+import math
 
 # Screen constants
 SCREEN_WIDTH = 1520
@@ -268,9 +269,11 @@ class PlatformerView(arcade.View):
         self.enemies.update_animation(delta_time)
         for enemy in self.enemies:
             enemy.center_x += enemy.change_x
+            enemy.angle += enemy.rotation_speed
             walls_hit = arcade.check_for_collision_with_list(sprite=enemy, sprite_list=self.walls)
             if walls_hit:
                 enemy.change_x *= -1
+                enemy.rotation_speed *= -1
 
         # update player movement based on physics engine
         self.physics_engine.update()
@@ -559,6 +562,9 @@ class Enemy(arcade.AnimatedWalkingSprite):
 
         # set initial texture
         self.texture = self.stand_left_textures[0]
+
+        # set rotation speed for bowling ball
+        self.rotation_speed = 5
 
 
 if __name__ == "__main__":
