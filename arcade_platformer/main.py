@@ -338,6 +338,17 @@ class PlatformerView(arcade.View):
                 align="center"
             )
 
+        if self.level == 3:
+            arcade.draw_text(
+                "Use the bowling pin (J key) to attack the bowling balls!",
+                start_x=50,
+                start_y=800,
+                width=300,
+                color=(206, 96, 188),  # RGB color tuple
+                font_size=40,
+                align="center"
+            )
+
     def scroll_viewport(self):
         # left boundary
         left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
