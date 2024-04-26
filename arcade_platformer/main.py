@@ -8,7 +8,7 @@ import math
 
 # Screen constants
 SCREEN_WIDTH = 1520
-SCREEN_HEIGHT = 680
+SCREEN_HEIGHT = 900
 SCREEN_TITLE = "Revenge of the Bowling Pins"
 
 ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "assets"
