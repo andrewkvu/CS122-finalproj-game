@@ -4,10 +4,11 @@ https://realpython.com/platformer-python-arcade/
 
 import arcade
 import pathlib
+import math
 
 # Screen constants
 SCREEN_WIDTH = 1520
-SCREEN_HEIGHT = 680
+SCREEN_HEIGHT = 900
 SCREEN_TITLE = "Revenge of the Bowling Pins"
 
 ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "assets"
@@ -16,7 +17,7 @@ MAP_SCALING = 1.0
 
 # Player constants
 GRAVITY = 1.0
-PLAYER_START_X = 500
+PLAYER_START_X = 400
 PLAYER_START_Y = 300
 PLAYER_MOVE_SPEED = 10
 PLAYER_JUMP_SPEED = 20
@@ -26,7 +27,7 @@ PLAYER_JUMP_SPEED = 20
 LEFT_VIEWPORT_MARGIN = SCREEN_WIDTH / 2.2
 RIGHT_VIEWPORT_MARGIN = SCREEN_WIDTH / 1.8
 TOP_VIEWPORT_MARGIN = SCREEN_HEIGHT / 3
-BOTTOM_VIEWPORT_MARGIN = SCREEN_HEIGHT / 3
+BOTTOM_VIEWPORT_MARGIN = SCREEN_HEIGHT / 3.5
 
 
 class PlatformerView(arcade.View):
@@ -268,9 +269,11 @@ class PlatformerView(arcade.View):
         self.enemies.update_animation(delta_time)
         for enemy in self.enemies:
             enemy.center_x += enemy.change_x
+            enemy.angle += enemy.rotation_speed
             walls_hit = arcade.check_for_collision_with_list(sprite=enemy, sprite_list=self.walls)
             if walls_hit:
                 enemy.change_x *= -1
+                enemy.rotation_speed *= -1
 
         # update player movement based on physics engine
         self.physics_engine.update()
@@ -324,25 +327,16 @@ class PlatformerView(arcade.View):
         self.player.draw()
         self.gutters.draw()
 
-        # draw score in lower left with text
-        # score_text = f"Score: {self.score}"
-
-        # arcade.draw_text(
-        #     score_text,
-        #     start_x=10 + self.view_left,
-        #     start_y=10 + self.view_bottom,
-        #     color=arcade.csscolor.BLACK,
-        #     font_size=40,
-        # )
-
-        # Now in white, slightly shifted
-        # arcade.draw_text(
-        #     score_text,
-        #     start_x=15 + self.view_left,
-        #     start_y=15 + self.view_bottom,
-        #     color=arcade.csscolor.WHITE,
-        #     font_size=40,
-        # )
+        if self.level == 1:
+            arcade.draw_text(
+                "Bowling World!!",
+                start_x=3000,
+                start_y=800,
+                width=40,
+                color=(206, 96, 188),  # RGB color tuple
+                font_size=80,
+                align="center"
+            )
 
     def scroll_viewport(self):
         # left boundary
@@ -391,7 +385,12 @@ class PlatformerView(arcade.View):
         enemies = arcade.SpriteList()
 
         if self.level == 2:
-            enemies.append(Enemy(2000, 320))
+            enemies.append(Enemy(2000, 320, 0.8))
+
+        if self.level == 3:
+            enemies.append(Enemy2(500, 1385, 1.3))
+            enemies.append(Enemy2(2000, 360, 1.3))
+            enemies.append(Enemy2(2500, 1385, 1.3))
 
         return enemies
 
@@ -521,12 +520,12 @@ class PauseView(arcade.View):
             self.window.show_view(self.game_view)
 
 
-# i assume with this you can probably inherit it and then just change the sprite image?
+# blue bowling ball
 class Enemy(arcade.AnimatedWalkingSprite):
     """enemy sprite with basic walking movement"""
 
-    def __init__(self, pos_x: int, pos_y: int):
-        super().__init__(center_x=pos_x, center_y=pos_y, scale=0.8)
+    def __init__(self, pos_x: int, pos_y: int, scale: float):
+        super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
 
@@ -559,6 +558,52 @@ class Enemy(arcade.AnimatedWalkingSprite):
 
         # set initial texture
         self.texture = self.stand_left_textures[0]
+
+        # set rotation speed for bowling ball
+        self.rotation_speed = 5
+
+
+# yellow bowling ball
+class Enemy2(arcade.AnimatedWalkingSprite):
+    """enemy sprite with basic walking movement"""
+
+    def __init__(self, pos_x: int, pos_y: int, scale: float):
+        super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        # enemy image storage location
+        texture_path = ASSETS_PATH / "images" / "enemies"
+
+        # set up appropriate textures
+        walking_texture_path = [
+            texture_path / "yellow_bb.png",
+        ]
+        standing_texture_path = texture_path / "yellow_bb.png"
+
+        # load all textures
+        self.walk_left_textures = [
+            arcade.load_texture(texture) for texture in walking_texture_path
+        ]
+
+        self.walk_right_textures = [
+            arcade.load_texture(texture, mirrored=True) for texture in walking_texture_path
+        ]
+
+        self.stand_left_textures = [
+            arcade.load_texture(standing_texture_path, mirrored=True)
+        ]
+
+        self.stand_right_textures = [
+            arcade.load_texture(standing_texture_path)
+        ]
+
+        # set enemy defaults
+        self.state = arcade.FACE_LEFT
+        self.change_x -= (PLAYER_MOVE_SPEED // 2)
+
+        # set initial texture
+        self.texture = self.stand_left_textures[0]
+
+        # set rotation speed for bowling ball
+        self.rotation_speed = 5
 
 
 if __name__ == "__main__":
