@@ -4,7 +4,7 @@
  <tileset firstgid="152" source="arcade_platformer.tsx"/>
  <layer id="7" name="gutters" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhMBoCj6FBAKLR2eh8kFKYOlxyUONoSsHsBlkCAIqhDU4=
+   eAFjYBgFoyEwGgKjITAaAqMhMBoCj6FBAKLR2eh8kFKYOlxyUOPoRgEAf/0Maw==
   </data>
  </layer>
  <layer id="1" name="ground" width="25" height="20">

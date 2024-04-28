@@ -237,7 +237,7 @@ class PlatformerView(arcade.View):
                 self.player.change_y = PLAYER_JUMP_SPEED
                 # arcade.play_sound(self.jump_sound)
 
-        elif key in [arcade.key.ESCAPE]:
+        elif key in [arcade.key.ESCAPE, arcade.key.P]:
             pause = PauseView(self)
             self.window.show_view(pause)
 
@@ -557,7 +557,7 @@ class PauseView(arcade.View):
 
         # now show pause text
         arcade.draw_text(
-            "PAUSED - ESC TO CONTINUE",
+            "PAUSED - ESC/P TO CONTINUE",
             start_x=self.game_view.view_left + 180,
             start_y=self.game_view.view_bottom + 300,
             color=arcade.color.INDIGO,
@@ -565,7 +565,7 @@ class PauseView(arcade.View):
         )
 
     def on_key_press(self, key: int, modifiers: int):
-        if key == arcade.key.ESCAPE:
+        if key in [arcade.key.ESCAPE, arcade.key.P]:
             # since you saved the game view, you can reactivate the game where it left off
             # rather than creating a new PlatformerView
             self.window.show_view(self.game_view)
