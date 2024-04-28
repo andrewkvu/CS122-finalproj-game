@@ -69,6 +69,9 @@ class PlatformerView(arcade.View):
         # initial level
         self.level = 1
 
+        # death counter
+        self.death_counter = 0
+
         # Load up our sounds here
         # self.coin_sound = arcade.load_sound(
         #     str(ASSETS_PATH / "sounds" / "coin.wav")
@@ -296,6 +299,7 @@ class PlatformerView(arcade.View):
         )
 
         if enemies_hit:
+            self.death_counter += 1
             self.setup()
             # title_view = TitleView()
             # window.show_view(title_view)
@@ -309,6 +313,7 @@ class PlatformerView(arcade.View):
 
         gutters_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.gutters)
         if gutters_hit:
+            self.death_counter += 1
             self.setup()
 
         # set viewport, scrolling if necessary
@@ -326,6 +331,14 @@ class PlatformerView(arcade.View):
         self.enemies.draw()
         self.player.draw()
         self.gutters.draw()
+
+        arcade.draw_text(
+            f"Deaths: {self.death_counter}",
+            start_x=self.view_left + 10,
+            start_y=self.view_bottom + SCREEN_HEIGHT - 30,
+            color=arcade.color.BLACK,
+            font_size=20,
+        )
 
         if self.level == 1:
             arcade.draw_text(
