@@ -69,6 +69,12 @@ class PlatformerView(arcade.View):
         # initial level
         self.level = 1
 
+        # death counter
+        self.death_counter = 0
+
+        # how many seconds have passed
+        self.elapsed_time = 0
+
         # Load up our sounds here
         # self.coin_sound = arcade.load_sound(
         #     str(ASSETS_PATH / "sounds" / "coin.wav")
@@ -231,7 +237,7 @@ class PlatformerView(arcade.View):
                 self.player.change_y = PLAYER_JUMP_SPEED
                 # arcade.play_sound(self.jump_sound)
 
-        elif key in [arcade.key.ESCAPE]:
+        elif key in [arcade.key.ESCAPE, arcade.key.P]:
             pause = PauseView(self)
             self.window.show_view(pause)
 
@@ -282,6 +288,8 @@ class PlatformerView(arcade.View):
         if self.player.left < 0:
             self.player.left = 0
 
+        self.elapsed_time += delta_time
+
         # check if we've picked up a coin
         # coins_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.coins)
 
@@ -296,6 +304,7 @@ class PlatformerView(arcade.View):
         )
 
         if enemies_hit:
+            self.death_counter += 1
             self.setup()
             # title_view = TitleView()
             # window.show_view(title_view)
@@ -305,10 +314,16 @@ class PlatformerView(arcade.View):
         if goals_hit:
             # self.victory_sound.play()
             self.level += 1
-            self.setup()
+            if self.level == 5:
+                arcade.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
+                completion_view = CompletionView(int(self.elapsed_time), self.death_counter)
+                self.window.show_view(completion_view)
+            else:
+                self.setup()
 
         gutters_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.gutters)
         if gutters_hit:
+            self.death_counter += 1
             self.setup()
 
         # set viewport, scrolling if necessary
@@ -326,6 +341,23 @@ class PlatformerView(arcade.View):
         self.enemies.draw()
         self.player.draw()
         self.gutters.draw()
+
+        arcade.draw_text(
+            f"Deaths: {self.death_counter}",
+            start_x=self.view_left + 10,
+            start_y=self.view_bottom + SCREEN_HEIGHT - 30,
+            color=arcade.color.BLACK,
+            font_size=20,
+        )
+
+        # Display timer
+        arcade.draw_text(
+            f"Time: {int(self.elapsed_time)}",
+            start_x=self.view_left + 10,
+            start_y=self.view_bottom + SCREEN_HEIGHT - 60,  # Adjusted position
+            color=arcade.color.BLACK,
+            font_size=20,
+        )
 
         if self.level == 1:
             arcade.draw_text(
@@ -397,11 +429,16 @@ class PlatformerView(arcade.View):
 
         if self.level == 2:
             enemies.append(Enemy(2000, 320, 0.8))
+            enemies.append(Enemy(3000, 320, 0.8))
 
         if self.level == 3:
             enemies.append(Enemy2(500, 1385, 1.3))
             enemies.append(Enemy2(2000, 360, 1.3))
             enemies.append(Enemy2(2500, 1385, 1.3))
+
+        if self.level == 4:
+            enemies.append(Enemy3(2800, 420, 1.8))
+            enemies.append(Enemy3(2000, 420, 1.8))
 
         return enemies
 
@@ -419,6 +456,9 @@ class TitleView(arcade.View):
 
         # are we showing instructions?
         self.show_instructions = False
+
+    def on_show(self):
+        arcade.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
 
     def on_update(self, delta_time: float):
         self.display_timer -= delta_time
@@ -517,7 +557,7 @@ class PauseView(arcade.View):
 
         # now show pause text
         arcade.draw_text(
-            "PAUSED - ESC TO CONTINUE",
+            "PAUSED - ESC/P TO CONTINUE",
             start_x=self.game_view.view_left + 180,
             start_y=self.game_view.view_bottom + 300,
             color=arcade.color.INDIGO,
@@ -525,10 +565,44 @@ class PauseView(arcade.View):
         )
 
     def on_key_press(self, key: int, modifiers: int):
-        if key == arcade.key.ESCAPE:
+        if key in [arcade.key.ESCAPE, arcade.key.P]:
             # since you saved the game view, you can reactivate the game where it left off
             # rather than creating a new PlatformerView
             self.window.show_view(self.game_view)
+
+
+class CompletionView(arcade.View):
+    def __init__(self, completion_time: int, death_count: int):
+        super().__init__()
+        self.completion_time = completion_time
+        self.death_count = death_count
+
+    def on_draw(self):
+        arcade.start_render()
+
+        arcade.draw_text(
+            f"Congratulations! You beat the game in {self.completion_time} seconds "
+            f"with {self.death_count} deaths.",
+            start_x=1600,
+            start_y=500,
+            color=arcade.color.BLACK,
+            font_size=36,
+            width=800
+        )
+
+        arcade.draw_text(
+            f"Thanks for playing! Press R to restart.",
+            start_x=1900,
+            start_y=400,
+            color=arcade.color.BLACK,
+            font_size=36,
+            width=800
+        )
+
+    def on_key_press(self, key: int, modifiers: int):
+        if key == arcade.key.R:
+            title_view = TitleView()
+            self.window.show_view(title_view)
 
 
 # blue bowling ball
@@ -616,6 +690,48 @@ class Enemy2(arcade.AnimatedWalkingSprite):
         # set rotation speed for bowling ball
         self.rotation_speed = 5
 
+
+# magenta (king) bowling ball
+class Enemy3(arcade.AnimatedWalkingSprite):
+    """enemy sprite with basic walking movement"""
+
+    def __init__(self, pos_x: int, pos_y: int, scale: float):
+        super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        # enemy image storage location
+        texture_path = ASSETS_PATH / "images" / "enemies"
+
+        # set up appropriate textures
+        walking_texture_path = [
+            texture_path / "magenta_crown_bb.png",
+        ]
+        standing_texture_path = texture_path / "magenta_crown_bb.png"
+
+        # load all textures
+        self.walk_left_textures = [
+            arcade.load_texture(texture) for texture in walking_texture_path
+        ]
+
+        self.walk_right_textures = [
+            arcade.load_texture(texture, mirrored=True) for texture in walking_texture_path
+        ]
+
+        self.stand_left_textures = [
+            arcade.load_texture(standing_texture_path, mirrored=True)
+        ]
+
+        self.stand_right_textures = [
+            arcade.load_texture(standing_texture_path)
+        ]
+
+        # set enemy defaults
+        self.state = arcade.FACE_LEFT
+        self.change_x -= (PLAYER_MOVE_SPEED // 2)
+
+        # set initial texture
+        self.texture = self.stand_left_textures[0]
+
+        # set rotation speed for bowling ball
+        self.rotation_speed = 5
 
 if __name__ == "__main__":
     window = arcade.Window(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title=SCREEN_TITLE)
