@@ -72,6 +72,9 @@ class PlatformerView(arcade.View):
         # death counter
         self.death_counter = 0
 
+        # how many seconds have passed
+        self.elapsed_time = 0
+
         # Load up our sounds here
         # self.coin_sound = arcade.load_sound(
         #     str(ASSETS_PATH / "sounds" / "coin.wav")
@@ -285,6 +288,8 @@ class PlatformerView(arcade.View):
         if self.player.left < 0:
             self.player.left = 0
 
+        self.elapsed_time += delta_time
+
         # check if we've picked up a coin
         # coins_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.coins)
 
@@ -336,6 +341,15 @@ class PlatformerView(arcade.View):
             f"Deaths: {self.death_counter}",
             start_x=self.view_left + 10,
             start_y=self.view_bottom + SCREEN_HEIGHT - 30,
+            color=arcade.color.BLACK,
+            font_size=20,
+        )
+
+        # Display timer
+        arcade.draw_text(
+            f"Time: {int(self.elapsed_time)}",
+            start_x=self.view_left + 10,
+            start_y=self.view_bottom + SCREEN_HEIGHT - 60,  # Adjusted position
             color=arcade.color.BLACK,
             font_size=20,
         )
