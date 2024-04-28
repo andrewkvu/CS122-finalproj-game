@@ -430,6 +430,9 @@ class PlatformerView(arcade.View):
             enemies.append(Enemy2(2000, 360, 1.3))
             enemies.append(Enemy2(2500, 1385, 1.3))
 
+        if self.level == 4:
+            enemies.append(Enemy3(2800, 420, 1.8))
+
         return enemies
 
 
@@ -643,6 +646,48 @@ class Enemy2(arcade.AnimatedWalkingSprite):
         # set rotation speed for bowling ball
         self.rotation_speed = 5
 
+
+# magenta (king) bowling ball
+class Enemy3(arcade.AnimatedWalkingSprite):
+    """enemy sprite with basic walking movement"""
+
+    def __init__(self, pos_x: int, pos_y: int, scale: float):
+        super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        # enemy image storage location
+        texture_path = ASSETS_PATH / "images" / "enemies"
+
+        # set up appropriate textures
+        walking_texture_path = [
+            texture_path / "magenta_crown_bb.png",
+        ]
+        standing_texture_path = texture_path / "magenta_crown_bb.png"
+
+        # load all textures
+        self.walk_left_textures = [
+            arcade.load_texture(texture) for texture in walking_texture_path
+        ]
+
+        self.walk_right_textures = [
+            arcade.load_texture(texture, mirrored=True) for texture in walking_texture_path
+        ]
+
+        self.stand_left_textures = [
+            arcade.load_texture(standing_texture_path, mirrored=True)
+        ]
+
+        self.stand_right_textures = [
+            arcade.load_texture(standing_texture_path)
+        ]
+
+        # set enemy defaults
+        self.state = arcade.FACE_LEFT
+        self.change_x -= (PLAYER_MOVE_SPEED // 2)
+
+        # set initial texture
+        self.texture = self.stand_left_textures[0]
+
+        # set rotation speed for bowling ball
+        self.rotation_speed = 5
 
 if __name__ == "__main__":
     window = arcade.Window(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title=SCREEN_TITLE)
