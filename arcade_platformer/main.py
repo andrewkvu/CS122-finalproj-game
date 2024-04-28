@@ -314,7 +314,12 @@ class PlatformerView(arcade.View):
         if goals_hit:
             # self.victory_sound.play()
             self.level += 1
-            self.setup()
+            if self.level == 5:
+                arcade.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
+                completion_view = CompletionView(int(self.elapsed_time), self.death_counter)
+                self.window.show_view(completion_view)
+            else:
+                self.setup()
 
         gutters_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.gutters)
         if gutters_hit:
@@ -424,6 +429,7 @@ class PlatformerView(arcade.View):
 
         if self.level == 2:
             enemies.append(Enemy(2000, 320, 0.8))
+            enemies.append(Enemy(3000, 320, 0.8))
 
         if self.level == 3:
             enemies.append(Enemy2(500, 1385, 1.3))
@@ -432,6 +438,7 @@ class PlatformerView(arcade.View):
 
         if self.level == 4:
             enemies.append(Enemy3(2800, 420, 1.8))
+            enemies.append(Enemy3(2000, 420, 1.8))
 
         return enemies
 
@@ -449,6 +456,9 @@ class TitleView(arcade.View):
 
         # are we showing instructions?
         self.show_instructions = False
+
+    def on_show(self):
+        arcade.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
 
     def on_update(self, delta_time: float):
         self.display_timer -= delta_time
@@ -559,6 +569,40 @@ class PauseView(arcade.View):
             # since you saved the game view, you can reactivate the game where it left off
             # rather than creating a new PlatformerView
             self.window.show_view(self.game_view)
+
+
+class CompletionView(arcade.View):
+    def __init__(self, completion_time: int, death_count: int):
+        super().__init__()
+        self.completion_time = completion_time
+        self.death_count = death_count
+
+    def on_draw(self):
+        arcade.start_render()
+
+        arcade.draw_text(
+            f"Congratulations! You beat the game in {self.completion_time} seconds "
+            f"with {self.death_count} deaths.",
+            start_x=1600,
+            start_y=500,
+            color=arcade.color.BLACK,
+            font_size=36,
+            width=800
+        )
+
+        arcade.draw_text(
+            f"Thanks for playing! Press R to restart.",
+            start_x=1900,
+            start_y=400,
+            color=arcade.color.BLACK,
+            font_size=36,
+            width=800
+        )
+
+    def on_key_press(self, key: int, modifiers: int):
+        if key == arcade.key.R:
+            title_view = TitleView()
+            self.window.show_view(title_view)
 
 
 # blue bowling ball
