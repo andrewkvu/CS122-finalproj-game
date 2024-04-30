@@ -258,7 +258,7 @@ class PlatformerView(arcade.View):
             self.update_player_speed()
 
     def on_update(self, delta_time: float):
-        """Updates the position of all game objects
+        """Updates the position of all game objectsd
         Moving player and enemy sprites
         detecting collisions with enemies and collectibles
         updating scores

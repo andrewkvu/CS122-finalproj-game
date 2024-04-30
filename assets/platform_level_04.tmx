@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="25" height="20" tilewidth="128" tileheight="128" infinite="0" backgroundcolor="#a6e7ff" nextlayerid="8" nextobjectid="23">
- <tileset firstgid="1" source="../materials-arcade-platformer/assets/arcade_platformer.tsx"/>
- <tileset firstgid="152" source="arcade_platformer.tsx"/>
+ <tileset firstgid="1" source="arcade_platformer.tsx"/>
  <layer id="7" name="gutters" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhMBoCj6FBAKLR2eh8kFKYOlxyUOPoRgEAf/0Maw==
+   eAFjYBgFoyEwGgKjITAaAqMhMBoCPtAgANHobHQ+SClMHS45qHF0owCH/gQp
   </data>
  </layer>
  <layer id="1" name="ground" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAF7xEBb8AhoPAjTEozaQXzojobVaFgRHwLEqxxNV6NhRXwIEK+SnukKZBcIwGh0NjofWR0uOZj76UUDAAZdP5E=
+   eAHzZqAt8AYaD8K0BKN2EB+6o2E1GlbEhwDxKkfT1WhYER8CxKukZ7oC2QUCMBqdjc5HVodLDuZ+etEAz8gVGQ==
   </data>
  </layer>
  <objectgroup id="6" name="moving_platforms">
-  <object id="19" gid="228" x="1023.94" y="2033.89" width="128" height="128">
+  <object id="19" gid="77" x="1023.94" y="2033.89" width="128" height="128">
    <properties>
     <property name="boundary_bottom" type="float" value="200"/>
     <property name="boundary_top" type="float" value="900"/>
     <property name="change_y" type="float" value="4"/>
    </properties>
   </object>
-  <object id="21" gid="228" x="1920.85" y="2269.33" width="128" height="128">
+  <object id="21" gid="77" x="1920.85" y="2269.33" width="128" height="128">
    <properties>
     <property name="boundary_bottom" type="float" value="200"/>
     <property name="boundary_top" type="float" value="900"/>
     <property name="change_y" type="float" value="4"/>
    </properties>
   </object>
-  <object id="22" gid="228" x="3781.45" y="245.091" width="128" height="128">
+  <object id="22" gid="77" x="3781.45" y="245.091" width="128" height="128">
    <properties>
     <property name="boundary_left" type="float" value="300"/>
     <property name="boundary_right" type="float" value="900"/>
@@ -37,7 +36,7 @@
  </objectgroup>
  <layer id="3" name="goal" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhQHwIbCJeKdkqh4sdZAcAGRoBimYCFw==
+   eAFjYBgFoyEwGgKjITAaAqMhQHwISBOvlGyVw8UOsgOADI0AaUQAUg==
   </data>
  </layer>
  <objectgroup id="4" name="coins" visible="0">
@@ -60,7 +59,7 @@
  </layer>
  <layer id="2" name="background" width="25" height="20">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhMHhDYDcNnLaTBmYOtJEAeUsBdQ==
+   eAFjYBgFoyEwGgKjITAaAqMhMHhDQIUGTlOigZkDbSQATZgARw==
   </data>
  </layer>
 </map>
