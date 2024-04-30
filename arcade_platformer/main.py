@@ -120,7 +120,6 @@ class PlatformerView(arcade.View):
         if self.level > 1:
             self.moving_platforms = self.scene[moving_platforms_layer]
 
-
             # so that player can stand on the moving platforms even though they are separate from the walls
             for sprite in self.moving_platforms:
                 self.walls.append(sprite)
@@ -164,19 +163,26 @@ class PlatformerView(arcade.View):
         texture_path = ASSETS_PATH / "images" / "player"
 
         # walking, climbing, and standing textures textures
-        walking_paths = [texture_path / "running" / f"frame-{x}.png" for x in range(1, 7)]
-        standing_path = [texture_path / "Idle" / f"frame-{x}.png" for x in (1, 2)]
+        walking_paths = [texture_path / "running" /
+                         f"frame-{x}.png" for x in range(1, 7)]
+        standing_path = [texture_path / "Idle" /
+                         f"frame-{x}.png" for x in (1, 2)]
 
         # load them all
-        walking_right_textures = [arcade.load_texture(texture) for texture in walking_paths]
+        walking_right_textures = [arcade.load_texture(
+            texture) for texture in walking_paths]
         walking_left_textures = [arcade.load_texture(texture, mirrored=True) for texture in
                                  walking_paths]  # mirrored very helpful
 
-        walking_up_textures = [arcade.load_texture(texture) for texture in walking_paths]
-        walking_down_textures = [arcade.load_texture(texture) for texture in walking_paths]
+        walking_up_textures = [arcade.load_texture(
+            texture) for texture in walking_paths]
+        walking_down_textures = [arcade.load_texture(
+            texture) for texture in walking_paths]
 
-        standing_right_textures = [arcade.load_texture(texture) for texture in standing_path]
-        standing_left_textures = [arcade.load_texture(texture, mirrored=True) for texture in standing_path]
+        standing_right_textures = [arcade.load_texture(
+            texture) for texture in standing_path]
+        standing_left_textures = [arcade.load_texture(
+            texture, mirrored=True) for texture in standing_path]
 
         # create player sprite
         player = arcade.AnimatedWalkingSprite(scale=0.2)
@@ -276,7 +282,8 @@ class PlatformerView(arcade.View):
         for enemy in self.enemies:
             enemy.center_x += enemy.change_x
             enemy.angle += enemy.rotation_speed
-            walls_hit = arcade.check_for_collision_with_list(sprite=enemy, sprite_list=self.walls)
+            walls_hit = arcade.check_for_collision_with_list(
+                sprite=enemy, sprite_list=self.walls)
             if walls_hit:
                 enemy.change_x *= -1
                 enemy.rotation_speed *= -1
@@ -310,18 +317,21 @@ class PlatformerView(arcade.View):
             # window.show_view(title_view)
 
         # now check if we're at goal
-        goals_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.goals)
+        goals_hit = arcade.check_for_collision_with_list(
+            sprite=self.player, sprite_list=self.goals)
         if goals_hit:
             # self.victory_sound.play()
             self.level += 1
             if self.level == 5:
                 arcade.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
-                completion_view = CompletionView(int(self.elapsed_time), self.death_counter)
+                completion_view = CompletionView(
+                    int(self.elapsed_time), self.death_counter)
                 self.window.show_view(completion_view)
             else:
                 self.setup()
 
-        gutters_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.gutters)
+        gutters_hit = arcade.check_for_collision_with_list(
+            sprite=self.player, sprite_list=self.gutters)
         if gutters_hit:
             self.death_counter += 1
             self.setup()
@@ -448,7 +458,7 @@ class TitleView(arcade.View):
         super().__init__()
 
         # use title image path and load it
-        title_image_path = ASSETS_PATH / "images" / "title_image.png"
+        title_image_path = ASSETS_PATH / "images" / "bowling_sprites" / "bowling-background.png"
         self.title_image = arcade.load_texture(title_image_path)
 
         # set display timer
@@ -479,14 +489,33 @@ class TitleView(arcade.View):
             texture=self.title_image,
         )
 
+        arcade.draw_text(
+            "The Revenge of the Bowling Pins",
+            start_x=100,
+            start_y=220,
+            color=arcade.color.WHITE_SMOKE,
+            font_size=50,
+            bold=True
+        )
+
+        arcade.draw_text(
+            "CS122 Andrew Vu Jooyul Yoon",
+            start_x=1350,
+            start_y=80,
+            color=arcade.color.WHITE_SMOKE,
+            font_size=20,
+            multiline=True,
+            width=150
+        )
+            
         # should we show instructions?
         if self.show_instructions:
             arcade.draw_text(
-                "Enter to Start | I for Instructions",
+                "Enter to Start  |  Press I for Instructions",
                 start_x=100,
-                start_y=220,
-                color=arcade.color.INDIGO,
-                font_size=40,
+                start_y=120,
+                color=arcade.color.WHITE_SMOKE,
+                font_size=30
             )
 
     def on_key_press(self, key: int, modifiers: int):
@@ -505,7 +534,7 @@ class InstructionsView(arcade.View):
 
         # instructions image and load it
         instructions_image_path = (
-                ASSETS_PATH / "images" / "instructions_image.png"
+            ASSETS_PATH / "images" / "instructions_image.png"
         )
         self.instructions_image = arcade.load_texture(instructions_image_path)
 
@@ -733,8 +762,10 @@ class Enemy3(arcade.AnimatedWalkingSprite):
         # set rotation speed for bowling ball
         self.rotation_speed = 5
 
+
 if __name__ == "__main__":
-    window = arcade.Window(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title=SCREEN_TITLE)
+    window = arcade.Window(
+        width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title=SCREEN_TITLE)
     # platform_view = PlatformerView()
     # platform_view.setup()
     title_screen = TitleView()
