@@ -227,7 +227,7 @@
   <image width="128" height="128" source="images/ground/Wood/main_plank.png"/>
  </tile>
  <tile id="75">
-  <image width="128" height="128" source="../../../../cool pictures/gutter.png"/>
+  <image width="128" height="128" source="images/ground/Gutter/gutter.png"/>
  </tile>
  <tile id="76">
   <image width="128" height="128" source="images/ground/Wood/half_plank.png"/>
