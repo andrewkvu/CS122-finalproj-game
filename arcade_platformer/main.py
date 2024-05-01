@@ -388,7 +388,15 @@ class PlatformerView(arcade.View):
             self.setup()
             # title_view = TitleView()
             # window.show_view(title_view)
-
+            
+        # weapon conllision
+        for enemy in self.enemies:    
+            weapon_hit = arcade.check_for_collision(self.weapon, enemy)
+            if weapon_hit:
+                enemy.remove_from_sprite_lists()
+                self.weapon_shooting = False
+            
+            
         # now check if we're at goal
         goals_hit = arcade.check_for_collision_with_list(
             sprite=self.player, sprite_list=self.goals)
