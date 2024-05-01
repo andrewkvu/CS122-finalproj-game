@@ -56,6 +56,7 @@ class PlatformerView(arcade.View):
         # one sprite for player
         self.player = None
         self.weapon = None
+        self.weapon_shooting = False
 
         # player movement key press state
         self.left_pressed = False
@@ -285,6 +286,10 @@ class PlatformerView(arcade.View):
                 self.player.change_y = PLAYER_JUMP_SPEED
                 # arcade.play_sound(self.jump_sound)
 
+        # Attack
+        elif key in [arcade.key.J] and not self.weapon_shooting:
+            self.weapon_shooting = True
+
         elif key in [arcade.key.ESCAPE, arcade.key.P]:
             pause = PauseView(self)
             self.window.show_view(pause)
@@ -319,14 +324,28 @@ class PlatformerView(arcade.View):
         # update player animation
         self.player.update_animation(delta_time)
         self.weapon.update_animation(delta_time)
-        
+
+        if self.weapon_shooting:
+            # Move weapon in the direction player is facing
+            if self.player.change_x > 0:
+                self.weapon.center_x += 50
+            elif self.player.change_x < 0:
+                self.weapon.center_x -= 50
+
+            # Check if weapon has reached max distance
+            if abs(self.weapon.center_x - self.player.center_x) >= 400:
+                self.weapon_shooting = False
+                self.center_x = self.player.center_x
+                self.center_y = self.player.center_y
+
         # Move weapon with the player
-        if self.player.state == arcade.FACE_RIGHT:
-            self.weapon.center_x = self.player.center_x + WEAPON_OFFSET_X
-            self.weapon.turn_right()
-        elif self.player.state == arcade.FACE_LEFT:
-            self.weapon.center_x = self.player.center_x - WEAPON_OFFSET_X
-            self.weapon.turn_left()
+        if self.player.change_x != 0:
+            if self.player.state == arcade.FACE_RIGHT and not self.weapon_shooting:
+                self.weapon.center_x = self.player.center_x + WEAPON_OFFSET_X
+                self.weapon.turn_right()
+            elif self.player.state == arcade.FACE_LEFT and not self.weapon_shooting:
+                self.weapon.center_x = self.player.center_x - WEAPON_OFFSET_X
+                self.weapon.turn_left()
         self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
 
         self.weapon.update()        
