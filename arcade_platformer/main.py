@@ -19,6 +19,8 @@ MAP_SCALING = 1.0
 GRAVITY = 1.0
 PLAYER_START_X = 400
 PLAYER_START_Y = 300
+WEAPON_OFFSET_X = 60
+WEAPON_OFFSET_Y = 10
 PLAYER_MOVE_SPEED = 10
 PLAYER_JUMP_SPEED = 20
 
@@ -53,6 +55,7 @@ class PlatformerView(arcade.View):
 
         # one sprite for player
         self.player = None
+        self.weapon = None
 
         # player movement key press state
         self.left_pressed = False
@@ -143,6 +146,16 @@ class PlatformerView(arcade.View):
         self.player.change_x = 0
         self.player.change_y = 0
 
+        # create weapon sprite if not already set up
+        if not self.weapon:
+            self.weapon = self.create_weapon_sprite()
+            
+        # move player sprite back to beginning
+        self.weapon.center_x = PLAYER_START_X
+        self.weapon.center_y = PLAYER_START_Y
+        self.weapon.change_x = 0
+        self.weapon.change_y = 0
+
         # set up enemies
         self.enemies = self.create_enemy_sprites()
 
@@ -157,6 +170,35 @@ class PlatformerView(arcade.View):
             gravity_constant=GRAVITY,
             ladders=self.ladders,
         )
+
+    def create_weapon_sprite(self) -> arcade.AnimatedWalkingSprite:
+        texture_path = ASSETS_PATH / "images" / "bowling_sprites"
+        
+        weapon_right_paths = [texture_path /
+                                               f"pin_{x}.png" for x in [1, 2]]
+        weapon_left_paths = [texture_path /
+                                               f"pin_{x}.png" for x in [3, 4]]
+        weapon_right_textures = [arcade.load_texture(texture) for texture in weapon_right_paths]
+        weapon_left_textures = [arcade.load_texture(texture) for texture in weapon_left_paths]
+        weapon = arcade.AnimatedWalkingSprite(scale=0.15,)
+
+        # initialize respective textures
+        weapon.stand_left_textures = weapon_left_textures
+        weapon.stand_right_textures = weapon_right_textures
+        weapon.walk_left_textures = weapon_left_textures
+        weapon.walk_right_textures = weapon_right_textures
+        # weapon.walk_up_textures = weapon_textures
+        # weapon.walk_down_textures = weapon_textures
+
+        # set weapon defaults
+        weapon.center_x = PLAYER_START_X + WEAPON_OFFSET_X
+        weapon.center_y = PLAYER_START_Y - WEAPON_OFFSET_Y
+        weapon.state = arcade.FACE_RIGHT
+
+        # set the initial textures
+        weapon.texture = weapon.stand_right_textures[0]
+        
+        return weapon
 
     def create_player_sprite(self) -> arcade.AnimatedWalkingSprite:
         # access path where player image is stored
@@ -276,6 +318,18 @@ class PlatformerView(arcade.View):
         # order here is important
         # update player animation
         self.player.update_animation(delta_time)
+        self.weapon.update_animation(delta_time)
+        
+        # Move weapon with the player
+        if self.player.state == arcade.FACE_RIGHT:
+            self.weapon.center_x = self.player.center_x + WEAPON_OFFSET_X
+            self.weapon.turn_right()
+        elif self.player.state == arcade.FACE_LEFT:
+            self.weapon.center_x = self.player.center_x - WEAPON_OFFSET_X
+            self.weapon.turn_left()
+        self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+
+        self.weapon.update()        
 
         # update enemies
         self.enemies.update_animation(delta_time)
@@ -349,6 +403,7 @@ class PlatformerView(arcade.View):
         self.goals.draw()
         self.ladders.draw()
         self.enemies.draw()
+        self.weapon.draw()
         self.player.draw()
         self.gutters.draw()
 
