@@ -21,6 +21,8 @@ PLAYER_START_X = 400
 PLAYER_START_Y = 300
 WEAPON_OFFSET_X = 60
 WEAPON_OFFSET_Y = 10
+WEAPON_SPEED = 20
+WEAPON_DISTANCE = 500
 PLAYER_MOVE_SPEED = 10
 PLAYER_JUMP_SPEED = 20
 
@@ -151,6 +153,8 @@ class PlatformerView(arcade.View):
         if not self.weapon:
             self.weapon = self.create_weapon_sprite()
             
+        self.weapon_firing_direction = arcade.FACE_RIGHT
+        
         # move player sprite back to beginning
         self.weapon.center_x = PLAYER_START_X
         self.weapon.center_y = PLAYER_START_Y
@@ -309,26 +313,32 @@ class PlatformerView(arcade.View):
 
         if self.weapon_shooting:
             # Move weapon in the direction player is facing
-            if self.player.change_x > 0:
-                self.weapon.center_x += 50
-            elif self.player.change_x < 0:
-                self.weapon.center_x -= 50
+            if self.weapon_firing_direction == arcade.FACE_RIGHT:
+                self.weapon.center_x += WEAPON_SPEED
+                self.weapon.turn_right()
+            else:
+                self.weapon.center_x -= WEAPON_SPEED
+                self.weapon.turn_left()
 
             # Check if weapon has reached max distance
-            if abs(self.weapon.center_x - self.player.center_x) >= 400:
+            if abs(self.weapon.center_x - self.player.center_x) >= WEAPON_DISTANCE:
+                self.weapon.angle = 0
+                self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
+                self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
                 self.weapon_shooting = False
-                self.center_x = self.player.center_x
-                self.center_y = self.player.center_y
 
-        # Move weapon with the player
-        if self.player.change_x != 0:
-            if self.player.state == arcade.FACE_RIGHT and not self.weapon_shooting:
-                self.weapon.center_x = self.player.center_x + WEAPON_OFFSET_X
-                self.weapon.texture =  self.weapon.textures[0]
-            elif self.player.state == arcade.FACE_LEFT and not self.weapon_shooting:
-                self.weapon.center_x = self.player.center_x - WEAPON_OFFSET_X
-                self.weapon.texture =  self.weapon.textures[1]
-        self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+        else:
+            # Move weapon with the player
+            if self.player.change_x != 0:
+                if self.player.state == arcade.FACE_RIGHT and not self.weapon_shooting:
+                    self.weapon.center_x = self.player.center_x + WEAPON_OFFSET_X
+                    self.weapon.texture =  self.weapon.textures[0]
+                    self.weapon_firing_direction = arcade.FACE_RIGHT
+                elif self.player.state == arcade.FACE_LEFT and not self.weapon_shooting:
+                    self.weapon.center_x = self.player.center_x - WEAPON_OFFSET_X
+                    self.weapon.texture =  self.weapon.textures[1]
+                    self.weapon_firing_direction = arcade.FACE_LEFT
+            self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
 
         self.weapon.update()        
 
@@ -371,13 +381,20 @@ class PlatformerView(arcade.View):
             # title_view = TitleView()
             # window.show_view(title_view)
             
-        # weapon conllision
+        # weapon enemies conllision
         for enemy in self.enemies:    
             weapon_hit = arcade.check_for_collision(self.weapon, enemy)
             if weapon_hit:
                 enemy.remove_from_sprite_lists()
                 self.weapon_shooting = False
             
+        # weapon wall collision
+        for wall in self.walls:
+            hit = arcade.check_for_collision(self.weapon, wall)
+            if hit:
+                self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
+                self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+                self.weapon_shooting = False
             
         # now check if we're at goal
         goals_hit = arcade.check_for_collision_with_list(
