@@ -172,33 +172,15 @@ class PlatformerView(arcade.View):
             ladders=self.ladders,
         )
 
-    def create_weapon_sprite(self) -> arcade.AnimatedWalkingSprite:
+    def create_weapon_sprite(self) -> arcade.Sprite:
         texture_path = ASSETS_PATH / "images" / "bowling_sprites"
-        
-        weapon_right_paths = [texture_path /
-                                               f"pin_{x}.png" for x in [1, 2]]
-        weapon_left_paths = [texture_path /
-                                               f"pin_{x}.png" for x in [3, 4]]
-        weapon_right_textures = [arcade.load_texture(texture) for texture in weapon_right_paths]
-        weapon_left_textures = [arcade.load_texture(texture) for texture in weapon_left_paths]
-        weapon = arcade.AnimatedWalkingSprite(scale=0.15,)
 
-        # initialize respective textures
-        weapon.stand_left_textures = weapon_left_textures
-        weapon.stand_right_textures = weapon_right_textures
-        weapon.walk_left_textures = weapon_left_textures
-        weapon.walk_right_textures = weapon_right_textures
-        # weapon.walk_up_textures = weapon_textures
-        # weapon.walk_down_textures = weapon_textures
-
-        # set weapon defaults
+        weapon = arcade.Sprite(scale=0.15)
+        weapon.textures = [arcade.load_texture(texture_path / "pin_1.png"), arcade.load_texture(texture_path / "pin_3.png")]
         weapon.center_x = PLAYER_START_X + WEAPON_OFFSET_X
         weapon.center_y = PLAYER_START_Y - WEAPON_OFFSET_Y
         weapon.state = arcade.FACE_RIGHT
-
-        # set the initial textures
-        weapon.texture = weapon.stand_right_textures[0]
-        
+        weapon.texture = weapon.textures[0]
         return weapon
 
     def create_player_sprite(self) -> arcade.AnimatedWalkingSprite:
@@ -342,10 +324,10 @@ class PlatformerView(arcade.View):
         if self.player.change_x != 0:
             if self.player.state == arcade.FACE_RIGHT and not self.weapon_shooting:
                 self.weapon.center_x = self.player.center_x + WEAPON_OFFSET_X
-                self.weapon.turn_right()
+                self.weapon.texture =  self.weapon.textures[0]
             elif self.player.state == arcade.FACE_LEFT and not self.weapon_shooting:
                 self.weapon.center_x = self.player.center_x - WEAPON_OFFSET_X
-                self.weapon.turn_left()
+                self.weapon.texture =  self.weapon.textures[1]
         self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
 
         self.weapon.update()        
