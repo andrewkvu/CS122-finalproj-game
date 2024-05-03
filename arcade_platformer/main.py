@@ -273,7 +273,11 @@ class PlatformerView(arcade.View):
                 # arcade.play_sound(self.jump_sound)
 
         # Attack
-        elif key in [arcade.key.J] and not self.weapon_shooting:
+        elif key in [arcade.key.J]:
+            if self.weapon_shooting:
+                self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
+                self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+                self.weapon_shooting = False
             self.weapon_shooting = True
 
         elif key in [arcade.key.ESCAPE, arcade.key.P]:
