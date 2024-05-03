@@ -19,12 +19,20 @@ MAP_SCALING = 1.0
 GRAVITY = 1.0
 PLAYER_START_X = 400
 PLAYER_START_Y = 300
+PLAYER_MOVE_SPEED = 10
+PLAYER_JUMP_SPEED = 20
+
+# Weapon constants
 WEAPON_OFFSET_X = 60
 WEAPON_OFFSET_Y = 10
 WEAPON_SPEED = 20
 WEAPON_DISTANCE = 500
-PLAYER_MOVE_SPEED = 10
-PLAYER_JUMP_SPEED = 20
+WEAPON_POWER = 1
+
+# Enemies constants
+ENEMY_HEALTH_1 = 3
+ENEMY_HEALTH_2 = 5
+ENEMY_HEALTH_3 = 10
 
 # Viewport margins
 # how close to scroll viewport?
@@ -390,8 +398,13 @@ class PlatformerView(arcade.View):
         for enemy in self.enemies:    
             weapon_hit = arcade.check_for_collision(self.weapon, enemy)
             if weapon_hit:
-                enemy.remove_from_sprite_lists()
+                self.weapon.angle = 0
+                self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
+                self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
                 self.weapon_shooting = False
+                enemy.set_health(enemy.get_health() - WEAPON_POWER)
+                if enemy.get_health() <= 0: 
+                    enemy.remove_from_sprite_lists()
             
         # weapon wall collision
         for wall in self.walls:
@@ -727,6 +740,10 @@ class Enemy(arcade.AnimatedWalkingSprite):
 
     def __init__(self, pos_x: int, pos_y: int, scale: float):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        
+        # set health
+        self.health = ENEMY_HEALTH_1
+        
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
 
@@ -762,6 +779,12 @@ class Enemy(arcade.AnimatedWalkingSprite):
 
         # set rotation speed for bowling ball
         self.rotation_speed = 5
+    
+    def get_health(self):
+        return self.health
+
+    def set_health(self, health):
+        self.health = health
 
 
 # yellow bowling ball
@@ -770,6 +793,10 @@ class Enemy2(arcade.AnimatedWalkingSprite):
 
     def __init__(self, pos_x: int, pos_y: int, scale: float):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        
+        # set health
+        self.health = ENEMY_HEALTH_2
+        
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
 
@@ -805,6 +832,12 @@ class Enemy2(arcade.AnimatedWalkingSprite):
 
         # set rotation speed for bowling ball
         self.rotation_speed = 5
+    
+    def get_health(self):
+        return self.health
+
+    def set_health(self, health):
+        self.health = health
 
 
 # magenta (king) bowling ball
@@ -813,6 +846,10 @@ class Enemy3(arcade.AnimatedWalkingSprite):
 
     def __init__(self, pos_x: int, pos_y: int, scale: float):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        
+        # set health
+        self.health = ENEMY_HEALTH_3
+        
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
 
@@ -848,6 +885,12 @@ class Enemy3(arcade.AnimatedWalkingSprite):
 
         # set rotation speed for bowling ball
         self.rotation_speed = 5
+    
+    def get_health(self):
+        return self.health
+
+    def set_health(self, health):
+        self.health = health
 
 
 if __name__ == "__main__":
