@@ -260,8 +260,10 @@ class PlatformerView(arcade.View):
             self.player.change_y = -PLAYER_MOVE_SPEED
         if self.left_pressed and not self.right_pressed:
             self.player.change_x = -PLAYER_MOVE_SPEED
+            self.player.state = arcade.FACE_LEFT
         elif self.right_pressed and not self.left_pressed:
             self.player.change_x = PLAYER_MOVE_SPEED
+            self.player.state = arcade.FACE_RIGHT
 
     def on_key_press(self, key: int, modifiers: int):
         """Called whenever a key is pressed. """
