@@ -34,6 +34,13 @@ ENEMY_HEALTH_1 = 3
 ENEMY_HEALTH_2 = 5
 ENEMY_HEALTH_3 = 10
 
+HEALTHBAR_WIDTH = 50
+HEALTHBAR_HEIGHT = 3
+HEALTHBAR_OFFSET_Y = 70
+
+HEALTH_NUMBER_OFFSET_X = -10
+HEALTH_NUMBER_OFFSET_Y = 75
+
 # Viewport margins
 # how close to scroll viewport?
 LEFT_VIEWPORT_MARGIN = SCREEN_WIDTH / 2.2
@@ -402,8 +409,8 @@ class PlatformerView(arcade.View):
                 self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
                 self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
                 self.weapon_shooting = False
-                enemy.set_health(enemy.get_health() - WEAPON_POWER)
-                if enemy.get_health() <= 0: 
+                enemy.cur_health = enemy.cur_health - WEAPON_POWER
+                if enemy.cur_health <= 0: 
                     enemy.remove_from_sprite_lists()
             
         # weapon wall collision
@@ -451,6 +458,10 @@ class PlatformerView(arcade.View):
         self.weapon.draw()
         self.player.draw()
         self.gutters.draw()
+        
+        for enemy in self.enemies:
+            enemy.draw_health_bar()
+            enemy.draw_health_number()
 
         arcade.draw_text(
             f"Deaths: {self.death_counter}",
@@ -742,7 +753,8 @@ class Enemy(arcade.AnimatedWalkingSprite):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
         
         # set health
-        self.health = ENEMY_HEALTH_1
+        self.max_health = ENEMY_HEALTH_1
+        self.cur_health = ENEMY_HEALTH_1
         
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
@@ -779,12 +791,36 @@ class Enemy(arcade.AnimatedWalkingSprite):
 
         # set rotation speed for bowling ball
         self.rotation_speed = 5
-    
-    def get_health(self):
-        return self.health
 
-    def set_health(self, health):
-        self.health = health
+    def draw_health_number(self):
+        """ Draw how many hit points we have """
+
+        health_string = f"{self.cur_health}/{self.max_health}"
+        arcade.draw_text(health_string,
+                        start_x=self.center_x + HEALTH_NUMBER_OFFSET_X,
+                        start_y=self.center_y + HEALTH_NUMBER_OFFSET_Y,
+                        font_size=12,
+                        color=arcade.color.WHITE)
+        
+    def draw_health_bar(self):
+        """ Draw the health bar """
+
+        # Draw the 'unhealthy' background
+        if self.cur_health < self.max_health:
+            arcade.draw_rectangle_filled(center_x=self.center_x,
+                                                center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                                width=HEALTHBAR_WIDTH,
+                                                height=3,
+                                                color=arcade.color.RED)
+
+        # Calculate width based on health
+        health_width = HEALTHBAR_WIDTH * (self.cur_health / self.max_health)
+
+        arcade.draw_rectangle_filled(center_x=self.center_x - 0.5 * (HEALTHBAR_WIDTH - health_width),
+                                    center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                    width=health_width,
+                                    height=HEALTHBAR_HEIGHT,
+                                    color=arcade.color.GREEN)
 
 
 # yellow bowling ball
@@ -795,7 +831,8 @@ class Enemy2(arcade.AnimatedWalkingSprite):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
         
         # set health
-        self.health = ENEMY_HEALTH_2
+        self.max_health = ENEMY_HEALTH_2
+        self.cur_health = ENEMY_HEALTH_2
         
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
@@ -832,12 +869,36 @@ class Enemy2(arcade.AnimatedWalkingSprite):
 
         # set rotation speed for bowling ball
         self.rotation_speed = 5
-    
-    def get_health(self):
-        return self.health
 
-    def set_health(self, health):
-        self.health = health
+    def draw_health_number(self):
+        """ Draw how many hit points we have """
+
+        health_string = f"{self.cur_health}/{self.max_health}"
+        arcade.draw_text(health_string,
+                        start_x=self.center_x + HEALTH_NUMBER_OFFSET_X,
+                        start_y=self.center_y + HEALTH_NUMBER_OFFSET_Y,
+                        font_size=12,
+                        color=arcade.color.WHITE)
+        
+    def draw_health_bar(self):
+        """ Draw the health bar """
+
+        # Draw the 'unhealthy' background
+        if self.cur_health < self.max_health:
+            arcade.draw_rectangle_filled(center_x=self.center_x,
+                                                center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                                width=HEALTHBAR_WIDTH,
+                                                height=3,
+                                                color=arcade.color.RED)
+
+        # Calculate width based on health
+        health_width = HEALTHBAR_WIDTH * (self.cur_health / self.max_health)
+
+        arcade.draw_rectangle_filled(center_x=self.center_x - 0.5 * (HEALTHBAR_WIDTH - health_width),
+                                    center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                    width=health_width,
+                                    height=HEALTHBAR_HEIGHT,
+                                    color=arcade.color.GREEN)
 
 
 # magenta (king) bowling ball
@@ -848,7 +909,8 @@ class Enemy3(arcade.AnimatedWalkingSprite):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
         
         # set health
-        self.health = ENEMY_HEALTH_3
+        self.max_health = ENEMY_HEALTH_3
+        self.cur_health = ENEMY_HEALTH_3
         
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
@@ -885,12 +947,36 @@ class Enemy3(arcade.AnimatedWalkingSprite):
 
         # set rotation speed for bowling ball
         self.rotation_speed = 5
-    
-    def get_health(self):
-        return self.health
 
-    def set_health(self, health):
-        self.health = health
+    def draw_health_number(self):
+        """ Draw how many hit points we have """
+
+        health_string = f"{self.cur_health}/{self.max_health}"
+        arcade.draw_text(health_string,
+                        start_x=self.center_x + HEALTH_NUMBER_OFFSET_X,
+                        start_y=self.center_y + HEALTH_NUMBER_OFFSET_Y,
+                        font_size=12,
+                        color=arcade.color.WHITE)
+        
+    def draw_health_bar(self):
+        """ Draw the health bar """
+
+        # Draw the 'unhealthy' background
+        if self.cur_health < self.max_health:
+            arcade.draw_rectangle_filled(center_x=self.center_x,
+                                                center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                                width=HEALTHBAR_WIDTH,
+                                                height=3,
+                                                color=arcade.color.RED)
+
+        # Calculate width based on health
+        health_width = HEALTHBAR_WIDTH * (self.cur_health / self.max_health)
+
+        arcade.draw_rectangle_filled(center_x=self.center_x - 0.5 * (HEALTHBAR_WIDTH - health_width),
+                                    center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                    width=health_width,
+                                    height=HEALTHBAR_HEIGHT,
+                                    color=arcade.color.GREEN)
 
 
 if __name__ == "__main__":
