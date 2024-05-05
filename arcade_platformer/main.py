@@ -26,7 +26,7 @@ PLAYER_JUMP_SPEED = 20
 WEAPON_OFFSET_X = 60
 WEAPON_OFFSET_Y = 10
 WEAPON_SPEED = 20
-WEAPON_DISTANCE = 500
+WEAPON_RANGE = 700
 WEAPON_POWER = 1
 
 # Enemies constants
@@ -341,7 +341,7 @@ class PlatformerView(arcade.View):
                 self.weapon.turn_left()
 
             # Check if weapon has reached max distance
-            if abs(self.weapon.center_x - self.player.center_x) >= WEAPON_DISTANCE:
+            if abs(self.weapon.center_x - self.player.center_x) >= WEAPON_RANGE:
                 self.weapon.angle = 0
                 self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
                 self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
@@ -404,7 +404,7 @@ class PlatformerView(arcade.View):
         # weapon enemies conllision
         for enemy in self.enemies:    
             weapon_hit = arcade.check_for_collision(self.weapon, enemy)
-            if weapon_hit:
+            if weapon_hit and self.weapon_shooting:
                 self.weapon.angle = 0
                 self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
                 self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
