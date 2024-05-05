@@ -22,6 +22,25 @@ PLAYER_START_Y = 300
 PLAYER_MOVE_SPEED = 10
 PLAYER_JUMP_SPEED = 20
 
+# Weapon constants
+WEAPON_OFFSET_X = 60
+WEAPON_OFFSET_Y = 10
+WEAPON_SPEED = 20
+WEAPON_RANGE = 700
+WEAPON_POWER = 1
+
+# Enemies constants
+ENEMY_HEALTH_1 = 3
+ENEMY_HEALTH_2 = 5
+ENEMY_HEALTH_3 = 10
+
+HEALTHBAR_WIDTH = 50
+HEALTHBAR_HEIGHT = 3
+HEALTHBAR_OFFSET_Y = 70
+
+HEALTH_NUMBER_OFFSET_X = -10
+HEALTH_NUMBER_OFFSET_Y = 75
+
 # Viewport margins
 # how close to scroll viewport?
 LEFT_VIEWPORT_MARGIN = SCREEN_WIDTH / 2.2
@@ -53,6 +72,8 @@ class PlatformerView(arcade.View):
 
         # one sprite for player
         self.player = None
+        self.weapon = None
+        self.weapon_shooting = False
 
         # player movement key press state
         self.left_pressed = False
@@ -120,7 +141,6 @@ class PlatformerView(arcade.View):
         if self.level > 1:
             self.moving_platforms = self.scene[moving_platforms_layer]
 
-
             # so that player can stand on the moving platforms even though they are separate from the walls
             for sprite in self.moving_platforms:
                 self.walls.append(sprite)
@@ -144,6 +164,18 @@ class PlatformerView(arcade.View):
         self.player.change_x = 0
         self.player.change_y = 0
 
+        # create weapon sprite if not already set up
+        if not self.weapon:
+            self.weapon = self.create_weapon_sprite()
+            
+        self.weapon_firing_direction = arcade.FACE_RIGHT
+        
+        # move player sprite back to beginning
+        self.weapon.center_x = PLAYER_START_X
+        self.weapon.center_y = PLAYER_START_Y
+        self.weapon.change_x = 0
+        self.weapon.change_y = 0
+
         # set up enemies
         self.enemies = self.create_enemy_sprites()
 
@@ -159,24 +191,42 @@ class PlatformerView(arcade.View):
             ladders=self.ladders,
         )
 
+    def create_weapon_sprite(self) -> arcade.Sprite:
+        texture_path = ASSETS_PATH / "images" / "bowling_sprites"
+
+        weapon = arcade.Sprite(scale=0.15)
+        weapon.textures = [arcade.load_texture(texture_path / "pin_1.png"), arcade.load_texture(texture_path / "pin_3.png")]
+        weapon.center_x = PLAYER_START_X + WEAPON_OFFSET_X
+        weapon.center_y = PLAYER_START_Y - WEAPON_OFFSET_Y
+        weapon.state = arcade.FACE_RIGHT
+        weapon.texture = weapon.textures[0]
+        return weapon
+
     def create_player_sprite(self) -> arcade.AnimatedWalkingSprite:
         # access path where player image is stored
         texture_path = ASSETS_PATH / "images" / "player"
 
         # walking, climbing, and standing textures textures
-        walking_paths = [texture_path / "running" / f"frame-{x}.png" for x in range(1, 7)]
-        standing_path = [texture_path / "Idle" / f"frame-{x}.png" for x in (1, 2)]
+        walking_paths = [texture_path / "running" /
+                         f"frame-{x}.png" for x in range(1, 7)]
+        standing_path = [texture_path / "Idle" /
+                         f"frame-{x}.png" for x in (1, 2)]
 
         # load them all
-        walking_right_textures = [arcade.load_texture(texture) for texture in walking_paths]
+        walking_right_textures = [arcade.load_texture(
+            texture) for texture in walking_paths]
         walking_left_textures = [arcade.load_texture(texture, mirrored=True) for texture in
                                  walking_paths]  # mirrored very helpful
 
-        walking_up_textures = [arcade.load_texture(texture) for texture in walking_paths]
-        walking_down_textures = [arcade.load_texture(texture) for texture in walking_paths]
+        walking_up_textures = [arcade.load_texture(
+            texture) for texture in walking_paths]
+        walking_down_textures = [arcade.load_texture(
+            texture) for texture in walking_paths]
 
-        standing_right_textures = [arcade.load_texture(texture) for texture in standing_path]
-        standing_left_textures = [arcade.load_texture(texture, mirrored=True) for texture in standing_path]
+        standing_right_textures = [arcade.load_texture(
+            texture) for texture in standing_path]
+        standing_left_textures = [arcade.load_texture(
+            texture, mirrored=True) for texture in standing_path]
 
         # create player sprite
         player = arcade.AnimatedWalkingSprite(scale=0.2)
@@ -239,6 +289,15 @@ class PlatformerView(arcade.View):
                 self.player.change_y = PLAYER_JUMP_SPEED
                 # arcade.play_sound(self.jump_sound)
 
+        # Attack
+        elif key in [arcade.key.J]:
+            if self.weapon_shooting:
+                self.weapon.angle = 0
+                self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
+                self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+                self.weapon_shooting = False
+            self.weapon_shooting = True
+
         elif key in [arcade.key.ESCAPE, arcade.key.P]:
             pause = PauseView(self)
             self.window.show_view(pause)
@@ -272,13 +331,46 @@ class PlatformerView(arcade.View):
         # order here is important
         # update player animation
         self.player.update_animation(delta_time)
+        self.weapon.update_animation(delta_time)
+
+        if self.weapon_shooting:
+            # Move weapon in the direction player is facing
+            if self.weapon_firing_direction == arcade.FACE_RIGHT:
+                self.weapon.center_x += WEAPON_SPEED
+                self.weapon.turn_right()
+            else:
+                self.weapon.center_x -= WEAPON_SPEED
+                self.weapon.turn_left()
+
+            # Check if weapon has reached max distance
+            if abs(self.weapon.center_x - self.player.center_x) >= WEAPON_RANGE:
+                self.weapon.angle = 0
+                self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
+                self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+                self.weapon_shooting = False
+
+        else:
+            # Move weapon with the player
+            if self.player.change_x != 0:
+                if self.player.state == arcade.FACE_RIGHT and not self.weapon_shooting:
+                    self.weapon.center_x = self.player.center_x + WEAPON_OFFSET_X
+                    self.weapon.texture =  self.weapon.textures[0]
+                    self.weapon_firing_direction = arcade.FACE_RIGHT
+                elif self.player.state == arcade.FACE_LEFT and not self.weapon_shooting:
+                    self.weapon.center_x = self.player.center_x - WEAPON_OFFSET_X
+                    self.weapon.texture =  self.weapon.textures[1]
+                    self.weapon_firing_direction = arcade.FACE_LEFT
+            self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+
+        self.weapon.update()        
 
         # update enemies
         self.enemies.update_animation(delta_time)
         for enemy in self.enemies:
             enemy.center_x += enemy.change_x
             enemy.angle += enemy.rotation_speed
-            walls_hit = arcade.check_for_collision_with_list(sprite=enemy, sprite_list=self.walls)
+            walls_hit = arcade.check_for_collision_with_list(
+                sprite=enemy, sprite_list=self.walls)
             if walls_hit:
                 enemy.change_x *= -1
                 enemy.rotation_speed *= -1
@@ -310,20 +402,44 @@ class PlatformerView(arcade.View):
             self.setup()
             # title_view = TitleView()
             # window.show_view(title_view)
-
+            
+        # weapon enemies conllision
+        for enemy in self.enemies:    
+            weapon_hit = arcade.check_for_collision(self.weapon, enemy)
+            if weapon_hit and self.weapon_shooting:
+                self.weapon.angle = 0
+                self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
+                self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+                self.weapon_shooting = False
+                enemy.cur_health = enemy.cur_health - WEAPON_POWER
+                if enemy.cur_health <= 0: 
+                    enemy.remove_from_sprite_lists()
+            
+        # weapon wall collision
+        for wall in self.walls:
+            hit = arcade.check_for_collision(self.weapon, wall)
+            if hit:
+                self.weapon.angle = 0
+                self.weapon.center_x = self.player.center_x + (WEAPON_OFFSET_X * (1 if self.player.state == arcade.FACE_RIGHT else -1))
+                self.weapon.center_y = self.player.center_y - WEAPON_OFFSET_Y
+                self.weapon_shooting = False
+            
         # now check if we're at goal
-        goals_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.goals)
+        goals_hit = arcade.check_for_collision_with_list(
+            sprite=self.player, sprite_list=self.goals)
         if goals_hit:
             # self.victory_sound.play()
             self.level += 1
             if self.level == 5:
                 arcade.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
-                completion_view = CompletionView(int(self.elapsed_time), self.death_counter)
+                completion_view = CompletionView(
+                    int(self.elapsed_time), self.death_counter)
                 self.window.show_view(completion_view)
             else:
                 self.setup()
 
-        gutters_hit = arcade.check_for_collision_with_list(sprite=self.player, sprite_list=self.gutters)
+        gutters_hit = arcade.check_for_collision_with_list(
+            sprite=self.player, sprite_list=self.gutters)
         if gutters_hit:
             self.death_counter += 1
             self.setup()
@@ -341,8 +457,13 @@ class PlatformerView(arcade.View):
         self.goals.draw()
         self.ladders.draw()
         self.enemies.draw()
+        self.weapon.draw()
         self.player.draw()
         self.gutters.draw()
+        
+        for enemy in self.enemies:
+            enemy.draw_health_bar()
+            enemy.draw_health_number()
 
         arcade.draw_text(
             f"Deaths: {self.death_counter}",
@@ -450,7 +571,7 @@ class TitleView(arcade.View):
         super().__init__()
 
         # use title image path and load it
-        title_image_path = ASSETS_PATH / "images" / "title_image.png"
+        title_image_path = ASSETS_PATH / "images" / "bowling_sprites" / "bowling-background.png"
         self.title_image = arcade.load_texture(title_image_path)
 
         # set display timer
@@ -481,14 +602,33 @@ class TitleView(arcade.View):
             texture=self.title_image,
         )
 
+        arcade.draw_text(
+            "The Revenge of the Bowling Pins",
+            start_x=100,
+            start_y=220,
+            color=arcade.color.WHITE_SMOKE,
+            font_size=50,
+            bold=True
+        )
+
+        arcade.draw_text(
+            "CS122 Andrew Vu Jooyul Yoon",
+            start_x=1350,
+            start_y=80,
+            color=arcade.color.WHITE_SMOKE,
+            font_size=20,
+            multiline=True,
+            width=150
+        )
+            
         # should we show instructions?
         if self.show_instructions:
             arcade.draw_text(
-                "Enter to Start | I for Instructions",
+                "Enter to Start  |  Press I for Instructions",
                 start_x=100,
-                start_y=220,
-                color=arcade.color.INDIGO,
-                font_size=40,
+                start_y=120,
+                color=arcade.color.WHITE_SMOKE,
+                font_size=30
             )
 
     def on_key_press(self, key: int, modifiers: int):
@@ -507,7 +647,7 @@ class InstructionsView(arcade.View):
 
         # instructions image and load it
         instructions_image_path = (
-                ASSETS_PATH / "images" / "instructions_image.png"
+            ASSETS_PATH / "images" / "instructions_image.png"
         )
         self.instructions_image = arcade.load_texture(instructions_image_path)
 
@@ -613,6 +753,11 @@ class Enemy(arcade.AnimatedWalkingSprite):
 
     def __init__(self, pos_x: int, pos_y: int, scale: float):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        
+        # set health
+        self.max_health = ENEMY_HEALTH_1
+        self.cur_health = ENEMY_HEALTH_1
+        
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
 
@@ -649,6 +794,36 @@ class Enemy(arcade.AnimatedWalkingSprite):
         # set rotation speed for bowling ball
         self.rotation_speed = 5
 
+    def draw_health_number(self):
+        """ Draw how many hit points we have """
+
+        health_string = f"{self.cur_health}/{self.max_health}"
+        arcade.draw_text(health_string,
+                        start_x=self.center_x + HEALTH_NUMBER_OFFSET_X,
+                        start_y=self.center_y + HEALTH_NUMBER_OFFSET_Y,
+                        font_size=12,
+                        color=arcade.color.WHITE)
+        
+    def draw_health_bar(self):
+        """ Draw the health bar """
+
+        # Draw the 'unhealthy' background
+        if self.cur_health < self.max_health:
+            arcade.draw_rectangle_filled(center_x=self.center_x,
+                                                center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                                width=HEALTHBAR_WIDTH,
+                                                height=3,
+                                                color=arcade.color.RED)
+
+        # Calculate width based on health
+        health_width = HEALTHBAR_WIDTH * (self.cur_health / self.max_health)
+
+        arcade.draw_rectangle_filled(center_x=self.center_x - 0.5 * (HEALTHBAR_WIDTH - health_width),
+                                    center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                    width=health_width,
+                                    height=HEALTHBAR_HEIGHT,
+                                    color=arcade.color.GREEN)
+
 
 # yellow bowling ball
 class Enemy2(arcade.AnimatedWalkingSprite):
@@ -656,6 +831,11 @@ class Enemy2(arcade.AnimatedWalkingSprite):
 
     def __init__(self, pos_x: int, pos_y: int, scale: float):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        
+        # set health
+        self.max_health = ENEMY_HEALTH_2
+        self.cur_health = ENEMY_HEALTH_2
+        
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
 
@@ -692,6 +872,36 @@ class Enemy2(arcade.AnimatedWalkingSprite):
         # set rotation speed for bowling ball
         self.rotation_speed = 5
 
+    def draw_health_number(self):
+        """ Draw how many hit points we have """
+
+        health_string = f"{self.cur_health}/{self.max_health}"
+        arcade.draw_text(health_string,
+                        start_x=self.center_x + HEALTH_NUMBER_OFFSET_X,
+                        start_y=self.center_y + HEALTH_NUMBER_OFFSET_Y,
+                        font_size=12,
+                        color=arcade.color.WHITE)
+        
+    def draw_health_bar(self):
+        """ Draw the health bar """
+
+        # Draw the 'unhealthy' background
+        if self.cur_health < self.max_health:
+            arcade.draw_rectangle_filled(center_x=self.center_x,
+                                                center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                                width=HEALTHBAR_WIDTH,
+                                                height=3,
+                                                color=arcade.color.RED)
+
+        # Calculate width based on health
+        health_width = HEALTHBAR_WIDTH * (self.cur_health / self.max_health)
+
+        arcade.draw_rectangle_filled(center_x=self.center_x - 0.5 * (HEALTHBAR_WIDTH - health_width),
+                                    center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                    width=health_width,
+                                    height=HEALTHBAR_HEIGHT,
+                                    color=arcade.color.GREEN)
+
 
 # magenta (king) bowling ball
 class Enemy3(arcade.AnimatedWalkingSprite):
@@ -699,6 +909,11 @@ class Enemy3(arcade.AnimatedWalkingSprite):
 
     def __init__(self, pos_x: int, pos_y: int, scale: float):
         super().__init__(center_x=pos_x, center_y=pos_y, scale=scale)
+        
+        # set health
+        self.max_health = ENEMY_HEALTH_3
+        self.cur_health = ENEMY_HEALTH_3
+        
         # enemy image storage location
         texture_path = ASSETS_PATH / "images" / "enemies"
 
@@ -735,8 +950,40 @@ class Enemy3(arcade.AnimatedWalkingSprite):
         # set rotation speed for bowling ball
         self.rotation_speed = 5
 
+    def draw_health_number(self):
+        """ Draw how many hit points we have """
+
+        health_string = f"{self.cur_health}/{self.max_health}"
+        arcade.draw_text(health_string,
+                        start_x=self.center_x + HEALTH_NUMBER_OFFSET_X,
+                        start_y=self.center_y + HEALTH_NUMBER_OFFSET_Y,
+                        font_size=12,
+                        color=arcade.color.WHITE)
+        
+    def draw_health_bar(self):
+        """ Draw the health bar """
+
+        # Draw the 'unhealthy' background
+        if self.cur_health < self.max_health:
+            arcade.draw_rectangle_filled(center_x=self.center_x,
+                                                center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                                width=HEALTHBAR_WIDTH,
+                                                height=3,
+                                                color=arcade.color.RED)
+
+        # Calculate width based on health
+        health_width = HEALTHBAR_WIDTH * (self.cur_health / self.max_health)
+
+        arcade.draw_rectangle_filled(center_x=self.center_x - 0.5 * (HEALTHBAR_WIDTH - health_width),
+                                    center_y=self.center_y + HEALTHBAR_OFFSET_Y,
+                                    width=health_width,
+                                    height=HEALTHBAR_HEIGHT,
+                                    color=arcade.color.GREEN)
+
+
 if __name__ == "__main__":
-    window = arcade.Window(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title=SCREEN_TITLE)
+    window = arcade.Window(
+        width=SCREEN_WIDTH, height=SCREEN_HEIGHT, title=SCREEN_TITLE)
     # platform_view = PlatformerView()
     # platform_view.setup()
     title_screen = TitleView()
